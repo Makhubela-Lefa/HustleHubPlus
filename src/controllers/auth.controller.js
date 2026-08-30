@@ -1,6 +1,10 @@
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const users = require("../models/user.model");
+
+const {
+    findUserByEmail,
+    createUser
+} = require("../models/user.model");
 
 const register = async (req, res) => {
     try {
@@ -18,9 +22,7 @@ const register = async (req, res) => {
         const normalizedEmail = email.trim().toLowerCase();
 
         // Check whether the email is already registered
-        const existingUser = users.find(
-            (user) => user.email === normalizedEmail
-        );
+        const existingUser = findUserByEmail(normalizedEmail);
 
         if (existingUser) {
             return res.status(409).json({
@@ -53,16 +55,16 @@ const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 12);
 
         // Create the new user
-        const newUser = {
-            id: crypto.randomUUID(),
-            name: name.trim(),
-            email: normalizedEmail,
-            password: hashedPassword,
-            role: normalizedRole
-        };
+       const newUser = {
+    id: crypto.randomUUID(),
+    name: name.trim(),
+    email: normalizedEmail,
+    passwordHash: hashedPassword,
+    role: normalizedRole
+};
 
         // Store the user temporarily
-        users.push(newUser);
+       createUser(newUser);
 
         //  this returns a safe response without the password/hash
         return res.status(201).json({
