@@ -47,3 +47,32 @@ HustleHubPlus/
 ├── .gitignore
 ├── package.json
 └── README.md
+
+## User Registration and Password Security
+
+HustleHub+ provides a secure user registration endpoint that allows Clients
+and Freelancers to create accounts. Registration requests are sent to the
+`/register` endpoint, where the registration controller processes the
+submitted user information before creating a new account.
+
+Before a user is registered, the system checks that all required fields have
+been provided. It also checks whether the email address is already registered,
+whether the password meets the minimum length requirement, and whether the
+selected role is valid. Email addresses are converted to lowercase to help
+prevent duplicate accounts caused by differences in capitalisation.
+
+Passwords are never stored in plain text. HustleHub+ uses bcrypt to hash each
+password before the user is added to temporary in-memory storage. The current
+implementation uses a bcrypt cost factor of 12. Bcrypt also applies a unique
+salt when hashing passwords, which helps protect passwords against attacks
+using precomputed hash values.
+
+Only the generated password hash is stored by the application. The original
+password is not retained. During the login process, the password entered by
+the user will later be compared with the stored bcrypt hash rather than
+decrypting or retrieving the original password.
+
+For Part 1, registered users are stored temporarily in an in-memory array.
+This means the registered users are removed when the server restarts.
+Persistent database storage using MongoDB will be introduced in a later part
+of the HustleHub+ project.
