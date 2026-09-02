@@ -91,3 +91,78 @@ const register = async (req, res) => {
 module.exports = {
     register
 };
+
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Make sure both login fields are provided
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password are required."
+            });
+        }
+
+        // Make sure login values are text
+        if (
+            typeof email !== "string" ||
+            typeof password !== "string"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password must be text values."
+            });
+        }
+
+        //normalise email before searching for the user
+        const normalizedEmail = email.trim().toLowerCase();
+
+        //await keeps this ready for an asynchronous MongoDB lookup later
+        const user = await findUserByEmail(normalizedEmail);
+
+        // use a generic response so we do not reveal whether an account exists.
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid credentials."
+            });
+        }
+
+        // Compare the entered password with the bcrypt hash from registration
+        const passwordMatches = await bcrypt.compare(
+            password,
+            user.passwordHash
+        );
+
+        if (!passwordMatches) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid credentials."
+            });
+        }
+
+        // Generate JWT only after the credentials are verified
+        const token = createAccessToken(user);
+
+        return res.status(200).json({
+            success: true,
+            message: "Login successful.",
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        });
+
+    } catch (error) {
+        console.error("Login error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "An unexpected error occurred."
+        });
+    }
+};
