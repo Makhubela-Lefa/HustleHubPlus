@@ -6,6 +6,10 @@ const {
     createUser
 } = require("../models/user.model");
 
+const {
+    createAccessToken
+} = require("../utils/jwt");
+
 const register = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
