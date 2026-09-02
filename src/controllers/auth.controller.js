@@ -3,6 +3,7 @@ const crypto = require("crypto");
 
 const {
     findUserByEmail,
+    findUserById,
     createUser
 } = require("../models/user.model");
 
