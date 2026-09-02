@@ -2,13 +2,11 @@ const jwt = require("jsonwebtoken");
 
 const JWT_ALGORITHM = "HS256";
 
-
-//Reads the JWT secret from the environment
-//The secret is never hard-coded in source code and must not be committed to GitHub
- 
+// Get JWT secret from the environment instead of hard-coding it
 const getJwtSecret = () => {
     const secret = process.env.JWT_SECRET;
 
+    // Require a sufficiently long secret for safer token signing
     if (!secret || secret.length < 32) {
         throw new Error(
             "JWT_SECRET must be configured with at least 32 characters."
@@ -18,8 +16,7 @@ const getJwtSecret = () => {
     return secret;
 };
 
-//Creates an access token for an authenticated HustleHub+ user
-//Only the information required for authentication/authorisation is placed inside the payload.
+// Create an access token containing only the user's required identity details
 const createAccessToken = (user) => {
     if (!user || !user.id || !user.role) {
         throw new Error(
@@ -40,8 +37,7 @@ const createAccessToken = (user) => {
     );
 };
 
-
-//Verifies a JWT received from a protected request
+// Verify that a token is valid and was signed using the expected settings
 
 const verifyAccessToken = (token) => {
     return jwt.verify(
