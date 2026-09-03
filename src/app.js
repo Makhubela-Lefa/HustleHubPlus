@@ -1,3 +1,4 @@
+const {notFoundHandler,errorHandler} = require("./middleware/error.middleware");
 const express = require('express');
 const healthRoutes = require('./routes/health.routes');
 const authRoutes = require('./routes/auth.routes');
@@ -15,11 +16,7 @@ app.use('/', authRoutes);
 
 // Controlled 404 response. Person D can later replace/extend this
 // with the group's centralised error-handling implementation.
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
-});
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 module.exports = app;
