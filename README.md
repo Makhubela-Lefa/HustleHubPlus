@@ -109,3 +109,20 @@ Authenticated requests send the token using the Bearer authentication format:
 
 ```http
 Authorization: Bearer <token>
+```
+
+The `authenticateToken` middleware retrieves the JWT from the `Authorization`
+header and verifies that the token is valid and has not expired. Once the token
+has been verified, the user's `id` and `role` are added to `req.user` so that
+protected routes can identify the authenticated user.
+
+The `/me` endpoint is protected using this middleware and demonstrates that the
+JWT is used after login to access protected functionality. If the token is
+missing, invalid, or expired, the request is rejected with a `401 Unauthorized`
+response. A valid token allows the request to continue and returns only the
+authenticated user's safe profile information without exposing the stored
+password hash.
+
+The authentication middleware is reusable so that later parts of HustleHub+
+can protect gig, booking, transaction, and administrative routes without
+repeating the JWT verification logic.
