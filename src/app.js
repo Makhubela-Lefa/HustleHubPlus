@@ -6,7 +6,8 @@ const authRoutes = require('./routes/auth.routes');
 const app = express();
 
 // Parse incoming JSON request bodies.
-app.use(express.json());
+// Limit JSON request bodies to reduce abuse from excessively large payloads
+app.use(express.json({ limit: "10kb" }));
 
 // Simple health endpoint used to verify that the API is running.
 app.use('/health', healthRoutes);

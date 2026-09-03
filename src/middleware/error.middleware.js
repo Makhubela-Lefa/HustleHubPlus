@@ -16,6 +16,14 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
+  //Handle request bodies that exceed the configured JSON size limit
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({
+      success: false,
+      message: "Request body is too large."
+    });
+  }
+
   //Log the full error on the server for debugging and internal error details are never returned to the client
   console.error("Unhandled application error:", err);
 
