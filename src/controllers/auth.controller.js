@@ -11,7 +11,7 @@ const {
     createAccessToken
 } = require("../utils/jwt");
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
     try {
         const { name, email, password, role } = req.body;
 
@@ -84,17 +84,13 @@ const register = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Registration error:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: "An unexpected error occurred."
-        });
-    }
+  //Pass unexpected controller errors to the centralized error handler
+  next(error);
+}
 };
 
 // USER LOGIN - Person C
-const login = async (req, res) => {
+const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
@@ -158,18 +154,14 @@ const login = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Login error:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: "An unexpected error occurred."
-        });
-    }
+  // Pass unexpected controller errors to the centralized error handler.
+  next(error);
+}
 };
 
 
 // AUTHENTICATED PROFILE - Person C
-const getMe = async (req, res) => {
+const getMe = async (req, res, next) => {
     try {
         //Find  user identified by the verified JWT
         const user = await findUserById(req.user.id);
@@ -193,13 +185,9 @@ const getMe = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Profile error:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: "An unexpected error occurred."
-        });
-    }
+  //Pass unexpected controller errors to the centralized error handler
+  next(error);
+}
 };
 
 
