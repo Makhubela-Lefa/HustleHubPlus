@@ -1,6 +1,4 @@
-const {
-    verifyAccessToken
-} = require("../utils/jwt");
+const {verifyAccessToken} = require("../utils/jwt");
 
 
 //Verify JWTs before allowing access to protected routes

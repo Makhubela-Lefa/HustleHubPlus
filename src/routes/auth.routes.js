@@ -1,17 +1,10 @@
-const {
-  validateRegistration,
-  validateLogin
-} = require("../middleware/validation.middleware");
+const {validateRegistration,validateLogin} = require("../middleware/validation.middleware");
 
 const express = require("express");
 
 const router = express.Router();
 
-const {
-    register,
-    login,
-    getMe
-} = require("../controllers/auth.controller");
+const {register,login,getMe} = require("../controllers/auth.controller");
 
 const {
     authenticateToken
