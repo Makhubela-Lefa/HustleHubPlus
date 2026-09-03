@@ -1,4 +1,7 @@
-const { validateRegistration } = require("../middleware/validation.middleware");
+const {
+  validateRegistration,
+  validateLogin
+} = require("../middleware/validation.middleware");
 
 const express = require("express");
 
@@ -36,10 +39,7 @@ router.post("/register", validateRegistration, register);
  *
  * without rewriting login()
  */
-router.post(
-    "/login",
-    login
-);
+router.post("/login", validateLogin, login);
 
 
 /*

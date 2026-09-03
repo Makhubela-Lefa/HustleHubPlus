@@ -1,3 +1,4 @@
+//Email format check used by both registration and login validation
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const validateRegistration = (req, res, next) => {
@@ -42,7 +43,7 @@ const validateRegistration = (req, res, next) => {
     });
   }
 
-//Checking if the password is more than 8 characters 
+//Checking if the password is more than 8 characters and throwing an error if not
   if (password.length < 8) {
     return res.status(400).json({
       success: false,
@@ -66,6 +67,41 @@ const validateRegistration = (req, res, next) => {
   next();
 };
 
+const validateLogin = (req, res, next) => {
+  const { email, password } = req.body || {};
+
+//Both fields email and password are required to attempt to login
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Email and password are required."
+    });
+  }
+
+  //Reject non-string values before using string methods such as trim()
+  if (typeof email !== "string" || typeof password !== "string") {
+    return res.status(400).json({
+      success: false,
+      message: "Email and password must be text values."
+    });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  //Reject incorrect formatted email addresses before authentication
+  if (!EMAIL_REGEX.test(normalizedEmail)) {
+    return res.status(400).json({
+      success: false,
+      message: "A valid email address is required."
+    });
+  }
+
+  req.body.email = normalizedEmail;
+
+  next();
+};
+
 module.exports = {
-  validateRegistration
+  validateRegistration,
+  validateLogin
 };
