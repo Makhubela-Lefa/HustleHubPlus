@@ -93,10 +93,6 @@ const register = async (req, res) => {
     }
 };
 
-module.exports = {
-    register
-};
-
 // USER LOGIN - Person C
 const login = async (req, res) => {
     try {
