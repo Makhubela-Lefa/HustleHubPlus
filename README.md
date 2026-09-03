@@ -23,7 +23,7 @@ The client will communicate with the backend through HTTPS. Requests will then b
 
 ## Project Structure
 
-We separated the backend into different folders so that all the code is not placed in one file.
+We separated the backend into different folders so that routes, application logic, security middleware, data handling, and reusable utilities are not all placed in a single file. This makes the API easier to maintain and allows security features to be applied consistently as HustleHub+ is extended in later parts.
 
 ```text
 HustleHubPlus/
@@ -35,18 +35,25 @@ HustleHubPlus/
 ├── src/
 │   ├── config/
 │   ├── controllers/
+│   │   ├── auth.controller.js
+│   │   └── health.controller.js
 │   ├── middleware/
+│   │   └── auth.middleware.js
 │   ├── models/
+│   │   └── user.model.js
 │   ├── routes/
 │   │   ├── auth.routes.js
 │   │   └── health.routes.js
 │   ├── utils/
+│   │   └── jwt.js
 │   ├── app.js
 │   └── server.js
 ├── .env.example
 ├── .gitignore
+├── package-lock.json
 ├── package.json
 └── README.md
+```
 
 ## User Registration and Password Security
 
@@ -76,3 +83,46 @@ For Part 1, registered users are stored temporarily in an in-memory array.
 This means the registered users are removed when the server restarts.
 Persistent database storage using MongoDB will be introduced in a later part
 of the HustleHub+ project.
+
+## Login and JWT Authentication
+
+HustleHub+ allows registered users to log in through the `/login` endpoint using
+their email address and password. The email address is converted to lowercase
+before the user is searched for so that the login process remains consistent
+with registration.
+
+During login, the password entered by the user is compared with the stored
+bcrypt `passwordHash` using `bcrypt.compare()`. The original password is never
+retrieved or decrypted. If the email address does not exist or the password is
+incorrect, the system returns the same `401 Unauthorized` response with an
+`Invalid credentials` message. This helps prevent the login process from
+revealing whether a particular email address is registered.
+
+After the user's credentials have been successfully verified, HustleHub+
+generates a JSON Web Token (JWT). The token contains the user's unique `id` and
+`role`, which can be used to identify the authenticated user and support
+role-based access control. Passwords and password hashes are not included in
+the token. The JWT is signed using a private `JWT_SECRET` stored in the local
+`.env` file, while `JWT_EXPIRES_IN` controls how long the token remains valid.
+
+Authenticated requests send the token using the Bearer authentication format:
+
+```http
+Authorization: Bearer <token>
+```
+
+The `authenticateToken` middleware retrieves the JWT from the `Authorization`
+header and verifies that the token is valid and has not expired. Once the token
+has been verified, the user's `id` and `role` are added to `req.user` so that
+protected routes can identify the authenticated user.
+
+The `/me` endpoint is protected using this middleware and demonstrates that the
+JWT is used after login to access protected functionality. If the token is
+missing, invalid, or expired, the request is rejected with a `401 Unauthorized`
+response. A valid token allows the request to continue and returns only the
+authenticated user's safe profile information without exposing the stored
+password hash.
+
+The authentication middleware is reusable so that later parts of HustleHub+
+can protect gig, booking, transaction, and administrative routes without
+repeating the JWT verification logic.

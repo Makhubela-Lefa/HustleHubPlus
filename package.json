@@ -21,6 +21,7 @@
     "bcrypt": "^6.0.0",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.3",
     "selfsigned": "^2.4.1"
   }
 }

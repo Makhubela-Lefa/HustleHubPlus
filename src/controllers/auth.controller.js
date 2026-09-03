@@ -3,8 +3,13 @@ const crypto = require("crypto");
 
 const {
     findUserByEmail,
+    findUserById,
     createUser
 } = require("../models/user.model");
+
+const {
+    createAccessToken
+} = require("../utils/jwt");
 
 const register = async (req, res) => {
     try {
@@ -88,6 +93,118 @@ const register = async (req, res) => {
     }
 };
 
+// USER LOGIN - Person C
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        //check that both login fields were provided
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password are required."
+            });
+        }
+
+        if (
+            typeof email !== "string" ||
+            typeof password !== "string"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password must be text values."
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+
+        // Await keeps this ready for an asynchronous database lookup
+        const user = await findUserByEmail(normalizedEmail);
+
+        // Use a generic response so login does not reveal whether an account exists
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid credentials."
+            });
+        }
+
+        // Compare the submitted password with the stored bcrypt hash
+        const passwordMatches = await bcrypt.compare(
+            password,
+            user.passwordHash
+        );
+
+        if (!passwordMatches) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid credentials."
+            });
+        }
+
+        //only create a JWT after the user's credentials are verified
+        const token = createAccessToken(user);
+
+        return res.status(200).json({
+            success: true,
+            message: "Login successful.",
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        });
+
+    } catch (error) {
+        console.error("Login error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "An unexpected error occurred."
+        });
+    }
+};
+
+
+// AUTHENTICATED PROFILE - Person C
+const getMe = async (req, res) => {
+    try {
+        //Find  user identified by the verified JWT
+        const user = await findUserById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
+
+        //Return profile details without exposing the password hash
+        return res.status(200).json({
+            success: true,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        });
+
+    } catch (error) {
+        console.error("Profile error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "An unexpected error occurred."
+        });
+    }
+};
+
+
 module.exports = {
-    register
+    register,
+    login,
+    getMe
 };
