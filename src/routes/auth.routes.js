@@ -1,3 +1,5 @@
+const { validateRegistration } = require("../middleware/validation.middleware");
+
 const express = require("express");
 
 const router = express.Router();
@@ -17,10 +19,7 @@ const {
  * Public registration endpoint
  * Person D can later insert registration validation middleware before the controller without changing the controller itself.
  */
-router.post(
-    "/register",
-    register
-);
+router.post("/register", validateRegistration, register);
 
 
 /*
