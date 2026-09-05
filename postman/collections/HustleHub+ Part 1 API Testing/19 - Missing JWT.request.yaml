@@ -1,0 +1,32 @@
+$kind: http-request
+url: https://localhost:3000/me
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 401\", function () {\r
+
+      \    pm.response.to.have.status(401);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Request without JWT is rejected\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.success).to.eql(false);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Authentication required message is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.message).to.eql(\"Authentication token is required.\");\r
+
+      });"
+    language: text/javascript
+order: 4503598672186752

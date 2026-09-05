@@ -12,8 +12,8 @@ const {
 
 
 /*
- * Public registration endpoint
- * Person D can later insert registration validation middleware before the controller without changing the controller itself.
+ * Public login endpoint
+ * Validates login input before authenticating the user
  */
 router.post("/register", validateRegistration, register);
 

@@ -1,0 +1,49 @@
+$kind: http-request
+url: https://localhost:3000/register
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"name\": \"Freelancer Test\",\r
+
+    \  \"email\": \"freelancertest@example.com\",\r
+
+    \  \"password\": \"Password123\",\r
+
+    \  \"role\": \"freelancer\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 201\", function () {\r
+
+      \    pm.response.to.have.status(201);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Freelancer registration was successful\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.success).to.eql(true);\r
+
+      \    pm.expect(json.user.role).to.eql(\"freelancer\");\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Password is not returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.user).to.not.have.property(\"password\");\r
+
+      \    pm.expect(json.user).to.not.have.property(\"passwordHash\");\r
+
+      });"
+    language: text/javascript
+order: 4029015109849682

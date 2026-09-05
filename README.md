@@ -120,17 +120,19 @@ The authentication middleware is reusable so that later parts of HustleHub+ can 
 
 ## Input Validation
 
-The HustleHub+ project checks the data which is sent to the registration and login endpoints before being passed to the controllers. A separate validation ‘middleware’ was added so that all invalid inputs can be rejected early, avoiding problems later within the application.
+The HustleHub+ project checks the data sent to the registration and login endpoints before it is passed to the controllers. Separate validation middleware is used so that invalid or malicious input can be rejected early, avoiding problems later within the application.
 
-The API checks that the ‘name’, ‘email’, ‘password’, and ‘role’ fields have all entered and that they are all string/text values. The validation for the field name must be between 2 and 50 characters long after extra spaces are removed. The email cannot be longer than 254 characters. The API also rejects any password that is more than 72 bytes because bcrypt only processes password up to this limit.
+The API checks that the `name`, `email`, `password`, and `role` fields have all been provided and contain string/text values. Names must be between 2 and 50 characters long after surrounding spaces are removed. Name input is also restricted to common characters used in names, such as letters, spaces, apostrophes, hyphens, and full stops. This helps reject markup and other malicious input such as `<script>` tags.
 
-The login endpoint checks if the fields ‘email’ and ‘password’ have been provided as string/text values as well. Registration and login also check for fields that should not be there. For example, if an extra field other than the ones registration and login needs is added, the request is rejected instead of simply accepting the data the endpoint does not expect. When validation fails, the API returns a controlled ‘400 Bad Request’ response with a clear message explaining the error.
+Email addresses cannot be longer than 254 characters and must match the expected email format. Registration and login also reject passwords longer than 72 bytes because bcrypt only processes passwords up to this limit.
+
+The login endpoint checks that the `email` and `password` fields have been provided as string/text values. Registration and login also reject unexpected fields. For example, if an extra field that the endpoint does not expect is submitted, the request is rejected instead of accepting unnecessary data. When validation fails, the API returns a controlled `400 Bad Request` response with a clear message explaining the error.
 
 ## Error Handling
 
-HustleHub+ uses centralized error-handling middleware so that errors are handled in a consistent and safe way. The API sends a simple JSON response with an appropriate HTTP status code and message. Route requests that do not exist will receive a response with ‘404 Not Found’ and invalid JSON body for example a missing closing brace returns ‘400 Bad Request’ instead of allowing a JSON parsing error to expose unnecessary technical information.
+HustleHub+ uses centralized error-handling middleware so that errors are handled in a consistent and safe way. The API sends a simple JSON response with an appropriate HTTP status code and message. Route requests that do not exist receive a `404 Not Found` response. Invalid JSON, such as a request body with a missing closing brace, returns `400 Bad Request` instead of allowing a JSON parsing error to expose unnecessary technical information.
 
-The JSON body is also limited to ‘10kb’, because registration and login endpoints only need small amounts of text data, if the limit is exceeded, the API returns a controlled ‘413 Payload Too Large’ response. Unexpected errors from the registration, login, and protected profile controllers are passed to the central error handler using ‘next(error)’. The full error can still be logged in the server terminal for development and debugging, but the client only receives a general ‘500 Internal Server Error’ message.
+The JSON body is also limited to `10kb` because the registration and login endpoints only need small amounts of text data. If the limit is exceeded, the API returns a controlled `413 Payload Too Large` response. Unexpected errors from the registration, login, and protected profile controllers are passed to the central error handler using `next(error)`. The full error can still be logged in the server terminal for development and debugging, but the client only receives a general `500 Internal Server Error` message.
 
 This means internal details such as stack traces, file paths, passwords, JWT secrets, and configuration values are not included in API error responses. Expected errors, such as invalid login details or a missing authentication token, still return their own appropriate status codes and messages.
 
@@ -140,11 +142,11 @@ The Part 1 backend currently provides four main endpoints:
 
 | Method | Endpoint | Purpose | Authentication |
 |---|---|---|---|
-| ‘GET’ | ‘/health’ | Checks that the API is running correctly over HTTPS. | No |
-| ‘POST’ | ‘/register’ | Creates a new Client or Freelancer account after validating the submitted data. | No |
-| ‘POST’ | ‘/login’ | Checks the user's email and password and returns a JWT after a successful login. | No |
-| ‘GET’ | ‘/me’ | Returns the profile information of the currently authenticated user. | Bearer JWT required |
+| `GET` | `/health` | Checks that the API is running correctly over HTTPS. | No |
+| `POST` | `/register` | Creates a new Client or Freelancer account after validating the submitted data. | No |
+| `POST` | `/login` | Checks the user's email and password and returns a JWT after a successful login. | No |
+| `GET` | `/me` | Returns the profile information of the currently authenticated user. | Bearer JWT required |
 
-The ‘/register’ and ‘/login’ endpoints are public because users need to be able to create an account and log in before they have a token. Input sent to these endpoints is checked by the validation middleware before it reaches the controllers.
+The `/register` and `/login` endpoints are public because users need to be able to create an account and log in before they have a token. Input sent to these endpoints is checked by the validation middleware before it reaches the controllers.
 
-The ‘/me’ endpoint is protected. The user must include a valid JWT in the ‘Authorization’ header using the Bearer token format. Requests with a missing, invalid, or expired token are rejected with a ‘401 Unauthorized’ response.
+The `/me` endpoint is protected. The user must include a valid JWT in the `Authorization` header using the Bearer token format. Requests with a missing, invalid, or expired token are rejected with a `401 Unauthorized` response.

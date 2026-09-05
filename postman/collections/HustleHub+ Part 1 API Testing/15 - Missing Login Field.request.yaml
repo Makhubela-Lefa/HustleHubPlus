@@ -1,0 +1,39 @@
+$kind: http-request
+url: https://localhost:3000/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"email\": \"clientTest@example.com\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 400\", function () {\r
+
+      \    pm.response.to.have.status(400);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Missing login field is rejected\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.success).to.eql(false);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Required login fields message is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.message).to.eql(\"Email and password are required.\");\r
+
+      });"
+    language: text/javascript
+order: 4503590062089419

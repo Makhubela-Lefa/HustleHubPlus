@@ -1,0 +1,40 @@
+$kind: http-request
+url: https://localhost:3000/me
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: invalid.jwt.token
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 401\", function () {\r
+
+      \    pm.response.to.have.status(401);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Invalid JWT is rejected\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.success).to.eql(false);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Invalid token message is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.message).to.eql(\r
+
+      \        \"Invalid or expired authentication token.\"\r
+
+      \    );\r
+
+      });"
+    language: text/javascript
+order: 4503599382285075

@@ -1,0 +1,41 @@
+$kind: http-request
+url: https://localhost:3000/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"email\": \"unknownuser@example.com\",\r
+
+    \  \"password\": \"Password123\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 401\", function () {\r
+
+      \    pm.response.to.have.status(401);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Unknown email is rejected\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.success).to.eql(false);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Generic credentials message is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.message).to.eql(\"Invalid credentials.\");\r
+
+      });"
+    language: text/javascript
+order: 4503520300704953

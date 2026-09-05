@@ -1,0 +1,54 @@
+$kind: http-request
+url: https://localhost:3000/register
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"name\": \"Large Body Example\",\r
+
+    \  \"email\": \"largebody@example.com\",\r
+
+    \  \"password\": \"Password123\",\r
+
+    \  \"role\": \"client\",\r
+
+    \  \"padding\": \"{{largeText}}\"\r
+
+    }"
+scripts:
+  - type: beforeRequest
+    code: "const largeText = \"A\".repeat(11000);\r
+
+      \r
+
+      pm.variables.set(\"largeText\", largeText);"
+    language: text/javascript
+  - type: afterResponse
+    code: "pm.test(\"Status code is 413\", function () {\r
+
+      \    pm.response.to.have.status(413);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Oversized request is rejected\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.success).to.eql(false);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Controlled payload size message is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.message).to.eql(\"Request body is too large.\");\r
+
+      });"
+    language: text/javascript
+order: 4503599590985464

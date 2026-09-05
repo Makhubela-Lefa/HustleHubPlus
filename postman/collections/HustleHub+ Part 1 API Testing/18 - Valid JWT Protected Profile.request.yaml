@@ -1,0 +1,50 @@
+$kind: http-request
+url: https://localhost:3000/me
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{jwt}}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Protected profile request was successful\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.success).to.eql(true);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"User profile is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.user).to.be.an(\"object\");\r
+
+      \    pm.expect(json.user.email).to.eql(\"clienttest@example.com\");\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Password information is not returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.user).to.not.have.property(\"password\");\r
+
+      \    pm.expect(json.user).to.not.have.property(\"passwordHash\");\r
+
+      });"
+    language: text/javascript
+order: 4503597490870491

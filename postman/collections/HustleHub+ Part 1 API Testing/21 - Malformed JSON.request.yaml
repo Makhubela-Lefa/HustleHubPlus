@@ -1,0 +1,43 @@
+$kind: http-request
+url: https://localhost:3000/register
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"name\": \"Broken JSON User\",\r
+
+    \  \"email\": \"broken@example.com\",\r
+
+    \  \"password\": \"Password123\",\r
+
+    \  \"role\": \"client\""
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 400\", function () {\r
+
+      \    pm.response.to.have.status(400);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Malformed JSON is handled safely\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.success).to.eql(false);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Controlled error message is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.message).to.eql(\"Invalid JSON in request body.\");\r
+
+      });"
+    language: text/javascript
+order: 4503599397823798

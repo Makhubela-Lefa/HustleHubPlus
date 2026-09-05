@@ -1,0 +1,51 @@
+$kind: http-request
+url: https://localhost:3000/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"email\": \"clientTest@example.com\",\r
+
+    \  \"password\": \"Password123\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      const json = pm.response.json();\r
+
+      \r
+
+      pm.test(\"Login was successful\", function () {\r
+
+      \    pm.expect(json.success).to.eql(true);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"JWT is returned\", function () {\r
+
+      \    pm.expect(json.token).to.be.a(\"string\").and.not.empty;\r
+
+      });\r
+
+      \r
+
+      // Save the JWT so protected requests can use it later\r
+
+      if (json.token) {\r
+
+      \    pm.collectionVariables.set(\"jwt\", json.token);\r
+
+      }"
+    language: text/javascript
+order: 4502864422968431

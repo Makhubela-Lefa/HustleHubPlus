@@ -1,6 +1,10 @@
 //REGISTER
 //Email format check used by both registration and login validation
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_REGEX =
+ /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+//Allow common characters used in real names while rejecting markup/special input
+const NAME_REGEX = /^[\p{L}\p{M} .'-]+$/u;
 
 const REGISTER_FIELDS = ["name", "email", "password", "role"];
 const LOGIN_FIELDS = ["email", "password"];
@@ -50,6 +54,13 @@ if (unexpectedFields.length > 0) {
   return res.status(400).json({
     success: false,
     message: "Name must be between 2 and 50 characters long."
+  });
+}
+  //Reject markup and other invalid characters in names
+  if (!NAME_REGEX.test(trimmedName)) {
+  return res.status(400).json({
+    success: false,
+    message: "Name contains invalid characters."
   });
 }
 
@@ -130,6 +141,14 @@ if (unexpectedFields.length > 0) {
     return res.status(400).json({
       success: false,
       message: "Email and password must be text values."
+    });
+  }
+
+  //Keep login password validation consistent with registration
+  if (Buffer.byteLength(password, "utf8") > 72) {
+    return res.status(400).json({
+      success: false,
+      message: "Password must not exceed 72 bytes."
     });
   }
 

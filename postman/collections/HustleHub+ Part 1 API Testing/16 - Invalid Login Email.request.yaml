@@ -1,0 +1,41 @@
+$kind: http-request
+url: https://localhost:3000/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"email\": \"not-an-email\",\r
+
+    \  \"password\": \"Password123\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 400\", function () {\r
+
+      \    pm.response.to.have.status(400);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Invalid login email is rejected\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.success).to.eql(false);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Invalid email message is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.message).to.eql(\"A valid email address is required.\");\r
+
+      });"
+    language: text/javascript
+order: 4503595931905533

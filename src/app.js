@@ -1,4 +1,4 @@
-const {notFoundHandler,errorHandler} = require("./middleware/error.middleware");
+const {notFoundHandler, errorHandler} = require("./middleware/error.middleware");
 const express = require('express');
 const healthRoutes = require('./routes/health.routes');
 const authRoutes = require('./routes/auth.routes');
@@ -12,12 +12,13 @@ app.use(express.json({ limit: "10kb" }));
 // Simple health endpoint used to verify that the API is running.
 app.use('/health', healthRoutes);
 
-// Person B and Person C will add /register and /login here.
+// Authentication routes for registration, login and protected user access.
 app.use('/', authRoutes);
 
-// Controlled 404 response. Person D can later replace/extend this
-// with the group's centralised error-handling implementation.
+// Return a controlled response when no route matches the request.
 app.use(notFoundHandler);
+
+// Handle unexpected application errors without exposing internal details.
 app.use(errorHandler);
 
 module.exports = app;

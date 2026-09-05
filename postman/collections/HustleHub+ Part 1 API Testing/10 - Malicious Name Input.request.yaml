@@ -1,0 +1,45 @@
+$kind: http-request
+url: https://localhost:3000/register
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"name\": \"<script>alert(1)</script>\",\r
+
+    \  \"email\": \"maliciousname@example.com\",\r
+
+    \  \"password\": \"Password123\",\r
+
+    \  \"role\": \"client\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 400\", function () {\r
+
+      \    pm.response.to.have.status(400);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Malicious name input is rejected\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.success).to.eql(false);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Invalid name message is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.message).to.eql(\"Name contains invalid characters.\");\r
+
+      });"
+    language: text/javascript
+order: 4502083144843966

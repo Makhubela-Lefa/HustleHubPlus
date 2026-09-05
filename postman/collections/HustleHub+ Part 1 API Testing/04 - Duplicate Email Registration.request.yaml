@@ -1,0 +1,45 @@
+$kind: http-request
+url: https://localhost:3000/register
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"name\": \"Duplicate Client\",\r
+
+    \  \"email\": \"clientTest@example.com\",\r
+
+    \  \"password\": \"Password123\",\r
+
+    \  \"role\": \"client\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 409\", function () {\r
+
+      \    pm.response.to.have.status(409);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Duplicate registration is rejected\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.success).to.eql(false);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Duplicate email message is returned\", function () {\r
+
+      \    const json = pm.response.json();\r
+
+      \    pm.expect(json.message).to.eql(\"A user with this email already exists.\");\r
+
+      });"
+    language: text/javascript
+order: 4318730466073696

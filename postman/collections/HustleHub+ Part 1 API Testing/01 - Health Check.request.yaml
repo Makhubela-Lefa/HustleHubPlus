@@ -1,0 +1,16 @@
+$kind: http-request
+url: https://localhost:3000/health
+method: GET
+body:
+  type: json
+  content: ""
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code is 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });"
+    language: text/javascript
+examples: .resources/01 - Health Check.resources/examples
+order: 1788623572316
