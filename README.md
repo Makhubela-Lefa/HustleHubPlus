@@ -1,3 +1,12 @@
+# Video Demostration Link
+https://youtu.be/xhEPgtXFNrg
+
+# Group Members
+Lefa Makhubela - ST10442096
+Hazel Mushakarara - ST10443516
+Lesego Raphahla Marota - ST10448763
+Zodea Jacobie - ST10440733
+
 # HustleHub+
 
 HustleHub+ is a freelance marketplace platform that we are developing using the MERN stack. The platform will allow freelancers to advertise their services and clients to browse and book those services. As the project develops, it will also record transactions and help freelancers keep track of their income and estimated tax.
